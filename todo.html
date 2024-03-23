@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Things to do for your dream</title>
+    <link rel="stylesheet" href="https://unpkg.com/tailwindcss@latest/dist/tailwind.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/material-design-icons@latest/iconfont/material-icons.css" />
+    <script src="https://unpkg.com/sweetalert2@latest/dist/sweetalert2.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center text-3xl font-bold">Things to do for your dream</h1>
+        <div class="progress-bar">
+            <div class="progress-bar-fill" id="progress-bar"></div>
+        </div>
+        <div class="tasks">
+            <div class="task-input-container">
+                <input type="text" id="task-input" placeholder="Add a task" />
+                <button id="add-task-button" type="button">
+                    <i class="material-icons">add</i>
+                </button>
+            </div>
+            <ul id="task-list"></ul>
+        </div>
+        <div class="buttons">
+            <button id="save-button" type="button">Save</button>
+            <button id="reset-button" type="button">Reset</button>
+        </div>
+    </div>
+
+    <script>
+        // Get elements
+        const taskInput = document.getElementById('task-input');
+        const taskList = document.getElementById('task-list');
+        const progressBar = document.getElementById('progress-bar');
+        const saveButton = document.getElementById('save-button');
+        const resetButton = document.getElementById('reset-button');
+
+        // Create array to store tasks
+        let tasks = [];
+
+        // Add event listener for add task button
+        document.getElementById('add-task-button').addEventListener('click', addTask);
+
+        // Add event listener for save button
+        saveButton.addEventListener('click', saveTasks);
+
+        // Add event listener for reset button
+        resetButton.addEventListener('click', resetTasks);
+
+        // Function to add a task
+        function addTask(e) {
+            e.preventDefault();
+
+            // Get task from input
+            const task = taskInput.value;
+
+            // Add task to array
+            tasks.push(task);
+
+            // Create new task element
+            const newTask = document.createElement('li');
+            newTask.classList.add('task');
+
+            // Create checkbox for task
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.classList.add('task-checkbox');
+
+            // Create label for task
+            const label = document.createElement('label');
+            label.classList.add('task-label');
+            label.textContent = task;
+
+            // Create delete button for task
+            const deleteButton = document.createElement('button');
+            deleteButton.classList.add('task-delete-button');
+            deleteButton.innerHTML = '<i class="material-icons">delete</i>';
+
+            // Add event listener for delete button
+            deleteButton.addEventListener('click', deleteTask);
+
+            // Add checkbox, label, and delete button to task element
+            newTask.appendChild(checkbox);
+            newTask.appendChild(label);
+            newTask.appendChild(deleteButton);
+
+            // Add task element to task list
+            taskList.appendChild(newTask);
+
+            // Update progress bar
+            updateProgressBar();
+
+            // Clear input
+            taskInput.value = '';
+        }
+
+        // Function to delete a task
+        function deleteTask(e) {
+            e.preventDefault();
+
+            // Get task element
+            const taskElement = e.target.parentElement;
+
+            // Get task index
+            const taskIndex = tasks.indexOf(taskElement.textContent);
+
+            // Remove task from array
+            tasks.splice(taskIndex, 1);
+
+            // Remove task element from task list
+            taskList.removeChild(taskElement);
+
+            // Update progress bar
+            updateProgressBar();
+        }
+
+        // Function to save tasks to local storage
+        function saveTasks() {
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+
+            // Show success message
+            Swal.fire({
+                title: 'Success!',
+                text: 'Your tasks have been saved.',
+                icon: 'success',
+            });
+        }
+
+        // Function to reset tasks
+        function resetTasks() {
+            // Clear tasks array
+            tasks = [];
+
+            // Clear task list
+            taskList.innerHTML = '';
+
+            // Update progress bar
+            updateProgressBar();
+
+            // Show success message
+            Swal.fire({
+                title: 'Success!',
+                text: 'Your tasks have been reset.',
+                icon: 'success',
+            });
+        }
+
+        // Function to update progress bar
+        function updateProgressBar() {
+            // Calculate progress percentage
+            const progress = (tasks.length - tasks.filter(task => task.checked).length) / tasks.length * 100;
+
+            // Set progress bar width
+            progressBar.style.width = `${progress}%`;
+        }
+
+        // Load tasks from local storage
+        const storedTasks = JSON.parse(localStorage.getItem('tasks'));
+        if (storedTasks) {
+            tasks = storedTasks;
+
+            // Add tasks to task list
+            storedTasks.forEach(task => {
+                // Create new task element
+                const newTask = document.createElement('li');
+                newTask.classList.add('task');
+
+                // Create checkbox for task
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.classList.add('task-checkbox');
+
+                // Create label for task
+                const label = document.createElement('label');
+                label.classList.add('task-label');
+                label.textContent = task;
+
+                // Create delete button for task
+                const deleteButton = document.createElement('button');
+                deleteButton.classList.add('task-delete-button');
+                deleteButton.innerHTML = '<i class="material-icons">delete</i>';
+
+                // Add event listener for delete button
+                deleteButton.addEventListener('click', deleteTask);
+
+                // Add checkbox, label, and delete button to task element
+                newTask.appendChild(checkbox);
+                newTask.appendChild(label);
+                newTask.appendChild(deleteButton);
+
+                // Add task element to task list
+                taskList.appendChild(newTask);
+            });
+
+            // Update progress bar
+            updateProgressBar();
+        }
+    </script>
+</body>
+
+</html>
